@@ -22,6 +22,35 @@ namespace ModbusRegisterMap
             Task.Run(() => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name)));
         }
     }
+    public abstract class ComplexDevTypeBase : DevTypeBase
+    {
+        protected IDeviceType[] Fields;
+
+        public override ushort[] GetWords()
+        {
+            ushort[] buf = new ushort[Size];
+            int i = 0;
+            foreach (var item in Fields)
+            {
+                item.GetWords().CopyTo(buf, i);
+                i += item.Size;
+            }
+            return buf;
+        }
+        public override void Set(byte[] data, int startIndex = 0)
+        {
+            foreach (var item in Fields)
+            {
+                item.Set(data, startIndex);
+                startIndex += item.Size * sizeof(ushort);
+            }
+            OnPropertyChanged();
+        }
+        public override void Set(string data)
+        {
+            throw new NotImplementedException();
+        }
+    }
 
     public class DevFloat : DevTypeBase
     {
@@ -121,30 +150,23 @@ namespace ModbusRegisterMap
         public static explicit operator DevULong(uint v) => new DevULong() { Value = v };
     }
 
-    public class AioCal : DevTypeBase
+    public class AioCal : ComplexDevTypeBase
     {
-        public float K { get; set; }
-        public float B { get; set; }
+        public AioCal()
+        {
+            Fields = new IDeviceType[] {
+                K,
+                B
+            };
+        }
+
+        public DevFloat K { get; set; } = new DevFloat();
+        public DevFloat B { get; set; } = new DevFloat();
 
         public override ushort Size => 2 * 2;
         public override object Get()
         {
             return this;
-        }
-
-        public override ushort[] GetWords()
-        {
-            throw new NotImplementedException();
-        }
-        public override void Set(byte[] data, int startIndex = 0)
-        {
-            K = BitConverter.ToSingle(data);
-            B = BitConverter.ToSingle(data, sizeof(float));
-            OnPropertyChanged();
-        }
-        public override void Set(string data)
-        {
-            throw new NotImplementedException();
         }
     }
 }
