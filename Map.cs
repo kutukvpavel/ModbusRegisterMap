@@ -42,14 +42,6 @@ namespace ModbusRegisterMap
             if (index >= 0) name += index.ToString();
             return (HoldingRegisters[name] as Register<DevFloat>).TypedValue.Value;
         }
-        public IRegister GetConfig(AdcConstants.ConfigurationRegisters reg)
-        {
-            return InputRegisters[AdcConstants.ConfigurationRegisterNames[reg]] as IRegister;
-        }
-        public ushort GetConfigValue(AdcConstants.ConfigurationRegisters reg)
-        {
-            return (ushort)(DevUShort)GetConfig(reg).Value;
-        }
         public void AddHolding<T>(string name, int num, bool poll = false) where T : IDeviceType, new()
         {
             Add<T>(HoldingRegisters, name, num, poll: poll, pollList: PollHoldingRegisters);

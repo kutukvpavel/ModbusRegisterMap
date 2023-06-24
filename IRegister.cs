@@ -11,6 +11,7 @@ namespace ModbusRegisterMap
         public ushort Address { get; }
         public ushort Length { get; }
         public string Name { get; }
+        public bool IsReadOnly { get; }
 
         public ushort[] GetWords();
         public void Set(params ushort[] regs);

@@ -8,7 +8,7 @@ namespace ModbusRegisterMap
 {
     public abstract class DevTypeBase : IDeviceType
     {
-        public event PropertyChangedEventHandler PropertyChanged;
+        public event PropertyChangedEventHandler? PropertyChanged;
 
         public abstract ushort Size { get; }
 
@@ -17,7 +17,7 @@ namespace ModbusRegisterMap
         public abstract void Set(byte[] data, int startIndex = 0);
         public abstract void Set(string data);
 
-        protected void OnPropertyChanged(string name = null)
+        protected void OnPropertyChanged(string? name = null)
         {
             Task.Run(() => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name)));
         }

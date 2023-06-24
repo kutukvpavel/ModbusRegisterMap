@@ -6,22 +6,23 @@ namespace ModbusRegisterMap
 {
     public class Register<T> : IRegister where T : IDeviceType, new()
     {
-        public Register(ushort addr, string name)
+        public Register(ushort addr, string name, bool ro = false)
         {
             if (!BitConverter.IsLittleEndian) throw new NotImplementedException("Non-LE archs not supported.");
             if ((TypedValue.Size > 1) && (TypedValue.Size % 2 != 0)) //32-bit alignment
                 throw new ArgumentException($"Device data type definition is wrong: {TypedValue.GetType()}");
             Address = addr;
             Name = name;
+            IsReadOnly = ro;
             TypedValue.PropertyChanged += TypedValue_PropertyChanged;
         }
 
-        private void TypedValue_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        private void TypedValue_PropertyChanged(object? sender, PropertyChangedEventArgs e)
         {
             OnPropertyChanged(nameof(Value));
             OnPropertyChanged(nameof(TypedValue));
         }
-        protected void OnPropertyChanged(string name = null)
+        protected void OnPropertyChanged(string? name = null)
         {
             Task.Run(() => {
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
@@ -34,8 +35,9 @@ namespace ModbusRegisterMap
         public ushort Address { get; }
         public ushort Length => TypedValue.Size; //In modbus words
         public string Name { get; }
+        public bool IsReadOnly { get; }
 
-        public event PropertyChangedEventHandler PropertyChanged;
+        public event PropertyChangedEventHandler? PropertyChanged;
 
         public ushort[] GetWords()
         {
