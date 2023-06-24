@@ -37,6 +37,18 @@ namespace ModbusRegisterMap
                 throw new ArgumentException("Specified input register does not exit in this map");
             return r;
         }
+        public ushort GetInputWord(string name)
+        {
+            if (InputRegisters[name] is not Register<DevUShort> res)
+                throw new ArgumentException("Specified input register does not exit or is not of type 'DevUshort'"); 
+            return res.TypedValue.Value;
+        }
+        public ushort GetHoldingWord(string name)
+        {
+            if (HoldingRegisters[name] is not Register<DevUShort> res)
+                throw new ArgumentException("Specified holding register does not exit or is not of type 'DevUshort'"); 
+            return res.TypedValue.Value;
+        }
         public float GetInputFloat(string name, int index = -1)
         {
             if (index >= 0) name += index.ToString();
