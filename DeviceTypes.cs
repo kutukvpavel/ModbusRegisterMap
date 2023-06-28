@@ -24,10 +24,13 @@ namespace ModbusRegisterMap
     }
     public abstract class ComplexDevTypeBase : DevTypeBase
     {
-        protected IDeviceType[] Fields;
+        protected IDeviceType[]? Fields;
 
         public override ushort[] GetWords()
         {
+            if (Fields == null) 
+                throw new Exception($"This ComplexDevType is not defined correctly: {Get().GetType().Name}");
+
             ushort[] buf = new ushort[Size];
             int i = 0;
             foreach (var item in Fields)
@@ -39,6 +42,9 @@ namespace ModbusRegisterMap
         }
         public override void Set(byte[] data, int startIndex = 0)
         {
+            if (Fields == null)
+                throw new Exception($"This ComplexDevType is not defined correctly: {Get().GetType().Name}");
+
             foreach (var item in Fields)
             {
                 item.Set(data, startIndex);

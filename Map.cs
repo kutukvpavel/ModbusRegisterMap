@@ -1,4 +1,6 @@
-﻿using System;
+﻿#define MODBUS_COMMON_MEMORY_SPACE
+
+using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 
@@ -6,6 +8,10 @@ namespace ModbusRegisterMap
 {
     public class Map
     {
+#if MODBUS_COMMON_MEMORY_SPACE
+        protected int RegisterAddAddr = 0;
+#endif
+
         public Map()
         {
             
@@ -69,30 +75,32 @@ namespace ModbusRegisterMap
         }
         public void AddInput<T>(string name, int num, bool cfg = false, bool poll = false) where T : IDeviceType, new()
         {
-            Add<T>(InputRegisters, name, num, cfg, poll, PollInputRegisters);
+            Add<T>(InputRegisters, name, num, cfg, true, poll, PollInputRegisters);
         }
 
-        private void Add<T>(OrderedDictionary to, string name, int num, bool cfg = false, bool poll = false, 
+        private void Add<T>(OrderedDictionary to, string name, int num, bool cfg = false, bool ro = false, bool poll = false, 
             List<string>? pollList = null) where T : IDeviceType, new()
         {
-            int addr = 0;
+#if !MODBUS_COMMON_MEMORY_SPACE
+            int RegisterAddAddr = 0;
             if (to.Count > 0)
             {
                 //Do not use ^1 with OrderedDictionary index-based access!! Will return NULL.
 #pragma warning disable IDE0056
                 if (to[to.Count - 1] is not IRegister last) throw new Exception("This cannot happen under normal circumstances!");
 #pragma warning restore IDE0056
-                addr = last.Address + last.Length;
+                RegisterAddAddr = last.Address + last.Length;
             }
+#endif
             string n = name;
             for (int i = 0; i < num; i++)
             {
                 if (num > 1) n = name + i.ToString();
-                var item = new Register<T>((ushort)addr, n);
+                var item = new Register<T>((ushort)RegisterAddAddr, n, ro);
                 to.Add(n, item);
                 if (cfg) ConfigRegisters.Add(n);
                 if (poll) pollList?.Add(n);
-                addr += item.Length;
+                RegisterAddAddr += item.Length;
             }
         }
     }
