@@ -24,9 +24,7 @@ namespace ModbusRegisterMap
         }
         protected void OnPropertyChanged(string? name = null)
         {
-            Task.Run(() => {
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
-            });
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
         }
 
         public Type Type => typeof(T);

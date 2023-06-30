@@ -25,6 +25,9 @@ namespace ModbusRegisterMap
 
         public void Clear()
         {
+#if MODBUS_COMMON_MEMORY_SPACE
+            RegisterAddAddr = 0;
+#endif
             HoldingRegisters.Clear();
             InputRegisters.Clear();
             ConfigRegisters.Clear();
@@ -33,40 +36,42 @@ namespace ModbusRegisterMap
         }
         public IRegister GetHolding(string name, int index)
         {
-            if (HoldingRegisters[name + index.ToString()] is not IRegister r)
-                throw new ArgumentException("Specified holding register does not exit in this map");
+            name += index.ToString();
+            if (HoldingRegisters[name] is not IRegister r)
+                throw new ArgumentException($"Specified holding register does not exit in this map: '{name}'");
             return r;
         }
         public IRegister GetInput(string name, int index)
         {
-            if (InputRegisters[name + index.ToString()] is not IRegister r)
-                throw new ArgumentException("Specified input register does not exit in this map");
+            name += index.ToString();
+            if (InputRegisters[name] is not IRegister r)
+                throw new ArgumentException($"Specified input register does not exit in this map: '{name}'");
             return r;
         }
         public ushort GetInputWord(string name)
         {
             if (InputRegisters[name] is not Register<DevUShort> res)
-                throw new ArgumentException("Specified input register does not exit or is not of type 'DevUshort'"); 
+                throw new ArgumentException($"Specified input register does not exit or is not of type 'DevUshort': '{name}'"); 
             return res.TypedValue.Value;
         }
         public ushort GetHoldingWord(string name)
         {
             if (HoldingRegisters[name] is not Register<DevUShort> res)
-                throw new ArgumentException("Specified holding register does not exit or is not of type 'DevUshort'"); 
+                throw new ArgumentException($"Specified holding register does not exit or is not of type 'DevUshort': '{name}'"); 
             return res.TypedValue.Value;
         }
         public float GetInputFloat(string name, int index = -1)
         {
             if (index >= 0) name += index.ToString();
             if (InputRegisters[name] is not Register<DevFloat> res)
-                throw new ArgumentException("Specified input register does not exit or is not of type 'DevFloat'"); 
+                throw new ArgumentException($"Specified input register does not exit or is not of type 'DevFloat': '{name}'"); 
             return res.TypedValue.Value;
         }
         public float GetHoldingFloat(string name, int index = -1)
         {
             if (index >= 0) name += index.ToString();
             if (HoldingRegisters[name] is not Register<DevFloat> res)
-                throw new ArgumentException("Specified holding register does not exit or is not of type 'DevFloat'"); 
+                throw new ArgumentException($"Specified holding register does not exit or is not of type 'DevFloat': '{name}'"); 
             return res.TypedValue.Value;
         }
         public void AddHolding<T>(string name, int num, bool poll = false) where T : IDeviceType, new()
