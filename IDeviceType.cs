@@ -44,5 +44,6 @@ namespace ModbusRegisterMap
             Set(GetBytes(data, Size));
         }
         public void Set(string data);
+        public void TrySet(string data);
     }
 }

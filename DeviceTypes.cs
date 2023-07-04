@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Threading.Tasks;
-using System.Linq;
 
 namespace ModbusRegisterMap
 {
@@ -16,10 +13,19 @@ namespace ModbusRegisterMap
         public abstract ushort[] GetWords();
         public abstract void Set(byte[] data, int startIndex = 0);
         public abstract void Set(string data);
+        
+        public void TrySet(string data)
+        {
+            SuppressEvents = true;
+            Set(data);
+            SuppressEvents = false;
+        }
+
+        protected bool SuppressEvents { get; set; } = false;
 
         protected void OnPropertyChanged(string? name = null)
         {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+            if (!SuppressEvents) PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
         }
     }
     public abstract class ComplexDevTypeBase : DevTypeBase
