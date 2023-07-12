@@ -3,7 +3,7 @@ using System.ComponentModel;
 
 namespace ModbusRegisterMap
 {
-    public interface IDeviceType : INotifyPropertyChanged
+    public interface IDeviceType : INotifyPropertyChanged, IFormattable
     {
         public static Type[] SimpleTypes { get; } =
         {

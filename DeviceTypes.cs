@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel;
+using YamlDotNet.Serialization;
 
 namespace ModbusRegisterMap
 {
@@ -7,13 +8,15 @@ namespace ModbusRegisterMap
     {
         public event PropertyChangedEventHandler? PropertyChanged;
 
+        [YamlIgnore]
         public abstract ushort Size { get; }
 
         public abstract object Get();
         public abstract ushort[] GetWords();
         public abstract void Set(byte[] data, int startIndex = 0);
         public abstract void Set(string data);
-        
+        public abstract string ToString(string? format, IFormatProvider? formatProvider);
+
         public void TrySet(string data)
         {
             SuppressEvents = true;
@@ -92,6 +95,10 @@ namespace ModbusRegisterMap
         {
             return Value.ToString(MathF.Abs(Value) < 0.001 ? "E6" : "F6");
         }
+        public override string ToString(string? format, IFormatProvider? formatProvider)
+        {
+            return Value.ToString(format, formatProvider);
+        }
 
         public static explicit operator float(DevFloat v) => v.Value;
         public static explicit operator DevFloat(float v) => new DevFloat() { Value = v };
@@ -125,6 +132,10 @@ namespace ModbusRegisterMap
         {
             return Value.ToString();
         }
+        public override string ToString(string? format, IFormatProvider? formatProvider)
+        {
+            return Value.ToString(format, formatProvider);
+        }
 
         public static explicit operator ushort(DevUShort v) => v.Value;
         public static explicit operator DevUShort(ushort v) => new DevUShort() { Value = v };
@@ -157,6 +168,10 @@ namespace ModbusRegisterMap
         {
             return Value.ToString();
         }
+        public override string ToString(string? format, IFormatProvider? formatProvider)
+        {
+            return Value.ToString(format, formatProvider);
+        }
 
         public static explicit operator uint(DevULong v) => v.Value;
         public static explicit operator DevULong(uint v) => new DevULong() { Value = v };
@@ -179,6 +194,10 @@ namespace ModbusRegisterMap
         public override object Get()
         {
             return this;
+        }
+        public override string ToString(string? format, IFormatProvider? formatProvider)
+        {
+            throw new NotImplementedException();
         }
     }
 }

@@ -1,8 +1,10 @@
 ﻿#define MODBUS_COMMON_MEMORY_SPACE
 
+using Avalonia.PropertyGrid.Model.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Linq;
 
 namespace ModbusRegisterMap
 {
@@ -33,6 +35,19 @@ namespace ModbusRegisterMap
             ConfigRegisters.Clear();
             PollInputRegisters.Clear();
             PollHoldingRegisters.Clear();
+        }
+        public IRegister? Find(string name)
+        {
+            IRegister? res = InputRegisters[name] as IRegister;
+            if (res != null) return res;
+            res = HoldingRegisters[name] as IRegister;
+            return res;
+        }
+        public IEnumerable<IRegister> GetPollRegs()
+        {
+            return PollHoldingRegisters.Select(x => HoldingRegisters[x] as IRegister)
+                .Concat(PollInputRegisters.Select(x => InputRegisters[x] as IRegister))
+                .Where(x => x != null).Cast<IRegister>();
         }
         public IRegister GetHolding(string name, int index)
         {
