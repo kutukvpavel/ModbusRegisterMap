@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ReactorControl.ModbusRegisterMap;
+using System;
 using System.ComponentModel;
 using YamlDotNet.Serialization;
 
@@ -67,6 +68,7 @@ namespace ModbusRegisterMap
         }
     }
 
+    [TypeConverter(typeof(DevFloatConverter))]
     public class DevFloat : DevTypeBase
     {
         public float Value { get; set; }
@@ -104,6 +106,7 @@ namespace ModbusRegisterMap
         public static explicit operator DevFloat(float v) => new DevFloat() { Value = v };
     }
 
+    [TypeConverter(typeof(DevUShortConverter))]
     public class DevUShort : DevTypeBase
     {
         public ushort Value { get; set; }
@@ -141,6 +144,7 @@ namespace ModbusRegisterMap
         public static explicit operator DevUShort(ushort v) => new DevUShort() { Value = v };
     }
 
+    [TypeConverter(typeof(DevULongConverter))]
     public class DevULong : DevTypeBase
     {
         public uint Value { get; set; }
