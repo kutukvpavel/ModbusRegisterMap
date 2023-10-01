@@ -1,6 +1,7 @@
 ﻿using ReactorControl.ModbusRegisterMap;
 using System;
 using System.ComponentModel;
+using System.Linq;
 using YamlDotNet.Serialization;
 
 namespace ModbusRegisterMap
@@ -35,6 +36,9 @@ namespace ModbusRegisterMap
     public abstract class ComplexDevTypeBase : DevTypeBase
     {
         protected IDeviceType[]? Fields;
+
+        [YamlIgnore]
+        public override ushort Size => (ushort)Fields.Sum(x => x.Size);
 
         public override ushort[] GetWords()
         {
@@ -186,15 +190,31 @@ namespace ModbusRegisterMap
         public AioCal()
         {
             Fields = new IDeviceType[] {
-                K,
-                B
+                _K,
+                _B
             };
         }
 
-        public DevFloat K { get; set; } = new DevFloat();
-        public DevFloat B { get; set; } = new DevFloat();
+        readonly DevFloat _K = new();
+        public DevFloat K
+        {
+            get => _K;
+            set
+            {
+                _K.Value = value.Value;
+            }
+        }
+        readonly DevFloat _B = new();
+        public DevFloat B 
+        {
+            get => _B;
+            set
+            {
+                _B.Value = value.Value;
+            }
+        }
 
-        public override ushort Size => 2 * 2;
+        //public override ushort Size => 2 * 2;
         public override object Get()
         {
             return this;
